@@ -39,6 +39,7 @@
 //     );
 // }
 "use client";
+import Link from "next/link";
 
 import { useEffect, useState } from "react";
 
@@ -57,7 +58,7 @@ export default function Header() {
 
     return (
         <header
-            className={`fixed top-0 left-0 w-full z-50 border-b transition-all duration-300
+            className={`fixed top-0 left-0 w-full z-50  transition-all duration-300
             ${scrolled
                     ? "bg-[#FBF3F0]/80 backdrop-blur-md shadow-sm"
                     : "bg-[#FBF3F0]"
@@ -73,7 +74,9 @@ export default function Header() {
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex space-x-8 text-[#3A2F2F]/70 font-medium">
                     <a href="#" className="hover:text-[#9C6871] transition">Home</a>
-                    <a href="#" className="hover:text-[#9C6871] transition">Skin Quiz</a>
+                    <Link href="/quiz" className="hover:text-[#9C6871] transition">
+                        Skin Quiz
+                    </Link>
                     <a href="#" className="hover:text-[#9C6871] transition">About</a>
                 </nav>
 
