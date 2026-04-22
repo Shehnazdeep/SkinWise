@@ -68,12 +68,14 @@ export default function Header() {
 
                 {/* Logo */}
                 <h1 className="text-xl font-semibold text-[#3A2F2F]">
-                    SkinWise
+                    <Link href="/">
+                        SkinWise </Link>
+
                 </h1>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex space-x-8 text-[#3A2F2F]/70 font-medium">
-                    <a href="#" className="hover:text-[#9C6871] transition">Home</a>
+                    <a href="/" className="hover:text-[#9C6871] transition">Home</a>
                     <Link href="/quiz" className="hover:text-[#9C6871] transition">
                         Skin Quiz
                     </Link>
