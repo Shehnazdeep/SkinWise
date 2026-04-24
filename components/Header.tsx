@@ -79,7 +79,7 @@ export default function Header() {
                     <Link href="/quiz" className="hover:text-[#9C6871] transition">
                         Skin Quiz
                     </Link>
-                    <a href="#" className="hover:text-[#9C6871] transition">About</a>
+                    <a href="/about" className="hover:text-[#9C6871] transition">About</a>
                 </nav>
 
                 {/* Actions + Hamburger */}
