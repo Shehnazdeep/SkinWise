@@ -5,7 +5,7 @@ export default function Footer() {
 
                 <p>
                     © {new Date().getFullYear()} <span className="font-medium text-[#3A2F2F]">SkinWise</span>.
-                    Educational use only.
+                    Created for Fun.
                 </p>
 
                 {/* Optional links */}
