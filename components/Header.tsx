@@ -43,6 +43,7 @@ import Link from "next/link";
 
 import { useEffect, useState } from "react";
 
+
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -90,12 +91,12 @@ export default function Header() {
                     <button className="hidden md:inline text-sm font-medium text-[#3A2F2F] hover:opacity-80 transition">
                         Sign In
                     </button>
-
-                    <button className="hidden md:inline-flex px-5 py-2 text-sm font-medium text-white rounded-full
+                    <Link href="/quiz">
+                        <button className="hidden md:inline-flex px-5 py-2 text-sm font-medium text-white rounded-full
                         bg-[#E6B8C2] hover:bg-[#B5838D] transition">
-                        Start Quiz
-                    </button>
-
+                            Start Quiz
+                        </button>
+                    </Link>
                     {/* Hamburger (mobile only) */}
                     {/* <button
                         onClick={() => setMenuOpen(!menuOpen)}
