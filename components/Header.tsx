@@ -67,7 +67,8 @@ export default function Header() {
             <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
 
                 {/* Logo */}
-                <h1 className="text-xl font-semibold text-[#3A2F2F]">
+                {/* <h1 className="text-xl font-semi-bold text-[#3A2F2F]"> */}
+                <h1 className="text-xl font-[family-name:var(--font-playfair)] text-[#3A2F2F]">
                     <Link href="/">
                         SkinWise </Link>
 
