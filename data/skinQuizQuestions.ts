@@ -36,6 +36,20 @@ export const skinQuizQuestions: Question[] = [
         ],
     },
     {
+
+        id: "eye_concern",
+        question: "What concerns do you have about your under-eye area?",
+        subtext: "This helps us tailor targeted eye care.",
+        options: [
+            { label: "Dark circles", value: "dark_circles", description: "Purple or brown under-eye tone" },
+            { label: "Fine lines & wrinkles", value: "wrinkles", description: "Creasing or aging signs" },
+            { label: "Puffiness", value: "puffiness", description: "Swelling or bags under the eyes" },
+            { label: "No major concerns", value: "none", description: "Just maintenance" },
+        ],
+
+
+    },
+    {
         id: "sensitivity",
         question: "How does your skin react to new products?",
         subtext: "This helps us suggest gentler or stronger actives.",
@@ -46,6 +60,7 @@ export const skinQuizQuestions: Question[] = [
             { label: "Very resilient", value: "resilient", description: "Can handle strong actives with no issue" },
         ],
     },
+
     {
         id: "routine",
         question: "What does your current routine look like?",
