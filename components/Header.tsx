@@ -88,9 +88,9 @@ export default function Header() {
                 <div className="flex items-center gap-4">
 
                     {/* Desktop buttons */}
-                    <button className="hidden md:inline text-sm font-medium text-[#3A2F2F] hover:opacity-80 transition">
+                    {/* <button className="hidden md:inline text-sm font-medium text-[#3A2F2F] hover:opacity-80 transition">
                         Sign In
-                    </button>
+                    </button> */}
                     <Link href="/quiz">
                         <button className="hidden md:inline-flex px-5 py-2 text-sm font-medium text-white rounded-full
                         bg-[#E6B8C2] hover:bg-[#B5838D] transition">
@@ -141,13 +141,13 @@ export default function Header() {
             {menuOpen && (
                 <div className="md:hidden border-t bg-[#FBF3F0]/90 backdrop-blur-md">
                     <nav className="flex flex-col px-6 py-4 space-y-4 text-[#3A2F2F]/80 font-medium">
-                        <a href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">Home</a>
-                        <a href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">Skin Quiz</a>
-                        <a href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">About</a>
+                        <a href="/" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">Home</a>
+                        <a href="/quiz" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">Skin Quiz</a>
+                        <a href="/about" onClick={() => setMenuOpen(false)} className="hover:text-[#9C6871]">About</a>
 
                         <hr className="border-[#3A2F2F]/10" />
 
-                        <button className="text-left text-sm font-medium">Sign In</button>
+                        {/* <button className="text-left text-sm font-medium">Sign In</button> */}
                         <button className="mt-5 px-4 py-2 text-sm font-medium text-white rounded-full
                             bg-[#E6B8C2] hover:bg-[#B5838D] transition">
                             Start Quiz
