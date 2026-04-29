@@ -10,13 +10,13 @@ export default function Footer() {
 
                 {/* Optional links */}
                 <div className="mt-3 flex justify-center gap-6 text-xs">
-                    <a href="#" className="hover:text-[#B5838D] transition">
+                    <a href="/privacy" className="hover:text-[#B5838D] transition">
                         Privacy
                     </a>
-                    <a href="#" className="hover:text-[#B5838D] transition">
+                    <a href="/terms" className="hover:text-[#B5838D] transition">
                         Terms
                     </a>
-                    <a href="#" className="hover:text-[#B5838D] transition">
+                    <a href="/contact" className="hover:text-[#B5838D] transition">
                         Contact
                     </a>
                 </div>
