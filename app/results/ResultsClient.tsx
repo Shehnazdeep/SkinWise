@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { buildSkinProfile, SkinAnswers, SkinProfile } from "@/lib/skinProfile";
-// Add this after your existing imports
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Product = {
     id: string;
@@ -19,7 +20,195 @@ type Product = {
         ulta: string;
     };
 };
-// ── Name prompt ──────────────────────────────────────────────────────────────
+
+type ProductsByCategory = Record<string, Product[]>;
+
+// ── Retailer icons ─────────────────────────────────────────────────────────────
+
+const retailerIcons: Record<string, string> = {
+    amazon: "/logos/Amazon_icon.png",
+    ulta: "/logos/ulta.png",
+    sephora: "/logos/sephora.png",
+};
+
+// ── Step → category mapping ───────────────────────────────────────────────────
+
+const stepToCategoryMap: Record<string, string> = {
+    "Cleanser": "cleanser",
+    "Moisturiser": "moisturizer",
+    "Moisturizer": "moisturizer",
+    "Serum": "serum",
+    "SPF": "spf",
+    "Toner": "toner",
+    "Eye cream": "eye-cream",
+    "Treatment": "serum",
+};
+
+// ── Buy links ─────────────────────────────────────────────────────────────────
+
+function BuyLinks({ buy_links }: { buy_links: Product["buy_links"] }) {
+    return (
+        <div className="flex gap-4 flex-wrap mt-4">
+            {Object.entries(buy_links).map(([retailer, url]) => (
+                <a
+                    key={retailer}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full border border-[#E6B8C2] hover:bg-[#3A2F2F]
+                       hover:border-[#3A2F2F] transition flex items-center justify-center overflow-hidden flex-shrink-0"
+                >
+                    <img
+                        src={retailerIcons[retailer]}
+                        alt={retailer}
+                        style={{ width: '55px', height: '55px', objectFit: 'contain' }}
+                    />
+                </a>
+            ))}
+        </div>
+    );
+}
+
+// ── Product recommendations inline ────────────────────────────────────────────
+
+function StepProducts({ step, products }: { step: string; products: Product[] }) {
+    const category = stepToCategoryMap[step];
+    if (!category || !products || products.length === 0) return null;
+
+    const categoryProducts = products.filter((p) => p.category === category);
+    if (categoryProducts.length === 0) return null;
+
+    const topPick = categoryProducts[0];
+    const alternatives = categoryProducts.slice(1, 3);
+
+    return (
+        <div className="mt-5 pt-4 border-t border-[#E6B8C2]/20">
+
+            {/* Top Pick */}
+            <div className="bg-[#FBF3F0] rounded-xl p-6 mb-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-[15px] bg-[#B5838D] text-white px-4 py-2 rounded-full font-medium tracking-wide">
+                        ⭐ Top Pick
+                    </span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                    <div>
+                        <p className="text-[14px] text-[#3A2F2F]/45 mt-0.5">{topPick.brand}</p>
+                        <p className="text-md font-medium text-[#3A2F2F]">{topPick.name}</p>
+
+                    </div>
+                </div>
+                <p className="text-[15px] text-[#3A2F2F]/55 leading-relaxed mt-4 mb-4 font-light">
+                    {topPick.description}
+                </p>
+                <BuyLinks buy_links={topPick.buy_links} />
+            </div>
+
+            {/* Alternatives */}
+            {alternatives.length > 0 && (
+                <div>
+                    <p className="text-[15px] uppercase tracking-[2px] text-[#3A2F2F]/35 mb-2">
+                        Also great
+                    </p>
+                    <div className="space-y-4">
+                        {alternatives.map((product) => (
+                            <div
+                                key={product.id}
+                                className="bg-white border border-[#E6B8C2]/30 rounded-xl p-6 mt-4
+                                           flex items-start justify-between gap-3 min-h-[80px]"
+                            >
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-md font-medium text-[#3A2F2F] truncate">
+                                        {product.name}
+                                    </p>
+                                    <p className="text-[14px] text-[#3A2F2F]/40 mt-0.5">
+                                        {product.brand}
+                                    </p>
+                                </div>
+                                <BuyLinks buy_links={product.buy_links} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ── Routine card with inline products ─────────────────────────────────────────
+
+function RoutineCard({
+    title,
+    steps,
+    accent,
+    products,
+    productsLoading,
+}: {
+    title: string;
+    steps: SkinProfile["morning"];
+    accent: string;
+    products: Product[];
+    productsLoading: boolean;
+}) {
+    return (
+        <div className="bg-white border border-[#E6B8C2]/40 rounded-3xl overflow-hidden">
+            <div className={`px-6 py-4 text-lg ${accent}`}>
+                <p className="text-md font-medium text-[#3A2F2F] mt-2">{title}</p>
+            </div>
+            <div className="divide-y divide-[#E6B8C2]/20">
+                {steps.map((s, i) => (
+                    <div key={i} className="px-6 py-5">
+                        <div className="flex gap-4 items-start">
+                            <span className="text-[11px] font-medium text-[#B5838D] uppercase
+                                             tracking-widest w-6 text-center mt-0.5 flex-shrink-0">
+                                {i + 1}
+                            </span>
+                            <div className="flex-1">
+                                <p className="text-md uppercase tracking-widest text-[#3A2F2F]/40 mb-0.5">
+                                    {s.step}
+                                </p>
+                                <p className="text-md font-medium text-[#3A2F2F] mb-1">
+                                    {s.product}
+                                </p>
+                                <p className="text-md text-[#3A2F2F]/50 font-light leading-relaxed">
+                                    {s.why}
+                                </p>
+
+                                {/* Inline product recommendations */}
+                                {productsLoading ? (
+                                    <div className="mt-4 pt-4 border-t border-[#E6B8C2]/20 animate-pulse space-y-2">
+                                        <div className="h-3 w-16 bg-[#E6B8C2]/40 rounded-full" />
+                                        <div className="h-16 bg-[#E6B8C2]/20 rounded-xl" />
+                                        <div className="h-10 bg-[#E6B8C2]/10 rounded-xl" />
+                                    </div>
+                                ) : (
+                                    <StepProducts step={s.step} products={products} />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// ── Loading intro skeleton ────────────────────────────────────────────────────
+
+function LoadingIntro() {
+    return (
+        <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-6 animate-pulse">
+            <div className="h-3 w-24 bg-[#E6B8C2]/40 rounded mb-4" />
+            <div className="space-y-2">
+                <div className="h-3 bg-[#E6B8C2]/30 rounded w-full" />
+                <div className="h-3 bg-[#E6B8C2]/30 rounded w-5/6" />
+                <div className="h-3 bg-[#E6B8C2]/30 rounded w-4/6" />
+            </div>
+        </div>
+    );
+}
+
+// ── Name prompt ───────────────────────────────────────────────────────────────
 
 function NamePrompt({ onSubmit }: { onSubmit: (name: string | null) => void }) {
     const [name, setName] = useState("");
@@ -64,67 +253,15 @@ function NamePrompt({ onSubmit }: { onSubmit: (name: string | null) => void }) {
     );
 }
 
-// ── Routine card ─────────────────────────────────────────────────────────────
-
-function RoutineCard({
-    title,
-    steps,
-    accent,
-}: {
-    title: string;
-    steps: SkinProfile["morning"];
-    accent: string;
-}) {
-    return (
-        <div className="bg-white border border-[#E6B8C2]/40 rounded-2xl overflow-hidden">
-            <div className={`px-6 py-4 ${accent}`}>
-                <p className="text-sm font-medium text-[#3A2F2F]">{title}</p>
-            </div>
-            <div className="divide-y divide-[#E6B8C2]/20">
-                {steps.map((s, i) => (
-                    <div key={i} className="px-6 py-4 flex gap-4 items-start">
-                        <span className="text-[11px] font-medium text-[#B5838D] uppercase tracking-widest
-                                         w-6 text-center mt-0.5 flex-shrink-0">
-                            {i + 1}
-                        </span>
-                        <div>
-                            <p className="text-xs uppercase tracking-widest text-[#3A2F2F]/40 mb-0.5">
-                                {s.step}
-                            </p>
-                            <p className="text-sm font-medium text-[#3A2F2F] mb-1">{s.product}</p>
-                            <p className="text-xs text-[#3A2F2F]/50 font-light leading-relaxed">{s.why}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-// ── Loading state ────────────────────────────────────────────────────────────
-
-function LoadingIntro() {
-    return (
-        <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-6 animate-pulse">
-            <div className="h-3 w-24 bg-[#E6B8C2]/40 rounded mb-4" />
-            <div className="space-y-2">
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-full" />
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-5/6" />
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-4/6" />
-            </div>
-        </div>
-    );
-}
-
 // ── Main results view ─────────────────────────────────────────────────────────
 
 function ResultsView({ profile, name }: { profile: SkinProfile; name: string | null }) {
     const [intro, setIntro] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-
     const [products, setProducts] = useState<Product[]>([]);
     const [productsLoading, setProductsLoading] = useState(true);
 
+    // Fetch AI intro
     useEffect(() => {
         async function fetchIntro() {
             try {
@@ -149,9 +286,7 @@ Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
 
                 const res = await fetch("/api/skin-intro", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "claude-sonnet-4-6",
                         max_tokens: 1000,
@@ -168,17 +303,16 @@ Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
                 setLoading(false);
             }
         }
-
         fetchIntro();
     }, [profile, name]);
 
-    //Use Effect for Products
+    // Fetch all products for this skin type in one call
     useEffect(() => {
         async function fetchProducts() {
             try {
                 const res = await fetch(`/api/products?skin_type=${profile.skinType}`)
                 const data = await res.json()
-                setProducts(data.products.slice(0, 6))
+                setProducts(data.products)
             } catch {
                 setProducts([])
             } finally {
@@ -190,7 +324,7 @@ Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
 
     return (
         <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-3xl mx-auto">
 
                 {/* Header */}
                 <div className="mb-8">
@@ -232,95 +366,29 @@ Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
                     </div>
                 ) : null}
 
-                {/* Routine cards */}
+                {/* Routine cards with inline product recommendations */}
                 <div className="space-y-5 mb-10">
                     <RoutineCard
                         title="☀️  Morning routine"
                         steps={profile.morning}
                         accent="bg-[#FBF3F0]"
+                        products={products}
+                        productsLoading={productsLoading}
                     />
                     <RoutineCard
                         title="🌙  Evening routine"
                         steps={profile.evening}
                         accent="bg-[#F0E4DF]"
+                        products={products}
+                        productsLoading={productsLoading}
                     />
-
-                </div>
-                {/* Recommended Products */}
-                <div className="mb-10">
-                    <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-2">
-                        Recommended for you
-                    </p>
-                    <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-[#3A2F2F] mb-6">
-                        Products that suit your skin
-                    </h2>
-
-                    {productsLoading ? (
-                        <div className="space-y-5">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="bg-white/70 border border-[#E6B8C2]/30 rounded-2xl p-5 animate-pulse">
-                                    <div className="h-3 w-24 bg-[#E6B8C2]/40 rounded mb-3" />
-                                    <div className="h-4 bg-[#E6B8C2]/30 rounded w-3/4 mb-2" />
-                                    <div className="h-3 bg-[#E6B8C2]/20 rounded w-full" />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="space-y-5">
-                            {products.map((product) => (
-                                <div
-                                    key={product.id}
-                                    className="bg-white border border-[#E6B8C2]/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition min-h-[280px]"
-                                >
-
-                                    {/* Category + Brand */}
-                                    <div className="flex items-center justify-between pt-3 mb-2 px-4 py-2">
-                                        <span className="text-[10px] uppercase tracking-[2px] text-[#B5838D]">
-                                            {product.category}
-                                        </span>
-                                        <span className="text-[10px] text-[#3A2F2F]/40">
-                                            {product.brand}
-                                        </span>
-                                    </div>
-
-                                    {/* Name */}
-                                    <p className="text-sm font-medium text-[#3A2F2F] mb-2 px-4">
-                                        {product.name}
-                                    </p>
-
-                                    {/* Description */}
-                                    <p className="text-xs text-[#3A2F2F]/50 font-light leading-relaxed mb-4 px-4">
-                                        {product.description}
-                                    </p>
-
-                                    {/* Buy links */}
-                                    <div className="flex gap-2 flex-wrap px-4 mb-4">
-                                        {Object.entries(product.buy_links).map(([retailer, url]) => (
-                                            <a
-                                                key={retailer}
-                                                href={url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="px-4 py-1.5 rounded-full border border-[#E6B8C2] text-[11px]
-                                                text-[#B5838D] hover:bg-[#3A2F2F] hover:text-white
-                                                hover:border-[#3A2F2F] transition-colors capitalize">
-
-
-                                                {retailer} →
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 {/* Retake */}
                 <div className="text-center">
                     <Link
                         href="/quiz"
-                        className="text-xs text-[#3A2F2F]/40 underline underline-offset-2
+                        className="text-s text-[#3A2F2F]/40 underline underline-offset-2
                                    hover:text-[#B5838D] transition"
                     >
                         Retake the quiz
@@ -332,7 +400,7 @@ Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
     );
 }
 
-// ── Root export ──────────────────────────────────────────────────────────────
+// ── Root export ───────────────────────────────────────────────────────────────
 
 export default function ResultsClient({ answers }: { answers: SkinAnswers }) {
     const [name, setName] = useState<string | null | undefined>(undefined);
