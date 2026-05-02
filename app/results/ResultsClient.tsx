@@ -1,3 +1,420 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import Link from "next/link";
+// import { buildSkinProfile, SkinAnswers, SkinProfile } from "@/lib/skinProfile";
+
+// // ── Types ─────────────────────────────────────────────────────────────────────
+
+// type Product = {
+//     id: string;
+//     name: string;
+//     brand: string;
+//     category: string;
+//     description: string;
+//     ingredients: string[];
+//     skin_type: string[];
+//     buy_links: {
+//         amazon: string;
+//         sephora: string;
+//         ulta: string;
+//     };
+// };
+
+// type ProductsByCategory = Record<string, Product[]>;
+
+// // ── Retailer icons ─────────────────────────────────────────────────────────────
+
+// const retailerIcons: Record<string, string> = {
+//     amazon: "/logos/Amazon_icon.png",
+//     ulta: "/logos/ulta.png",
+//     sephora: "/logos/sephora.png",
+// };
+
+// // ── Step → category mapping ───────────────────────────────────────────────────
+
+// const stepToCategoryMap: Record<string, string> = {
+//     "Cleanser": "cleanser",
+//     "Moisturiser": "moisturizer",
+//     "Moisturizer": "moisturizer",
+//     "Serum": "serum",
+//     "SPF": "spf",
+//     "Toner": "toner",
+//     "Eye cream": "eye-cream",
+//     "Treatment": "serum",
+// };
+
+// // ── Buy links ─────────────────────────────────────────────────────────────────
+
+// function BuyLinks({ buy_links }: { buy_links: Product["buy_links"] }) {
+//     return (
+//         <div className="flex gap-4 flex-wrap mt-4">
+//             {Object.entries(buy_links).map(([retailer, url]) => (
+//                 <a
+//                     key={retailer}
+//                     href={url}
+//                     target="_blank"
+//                     rel="noopener noreferrer"
+//                     className="w-10 h-10 rounded-full border border-[#E6B8C2] hover:bg-[#3A2F2F]
+//                        hover:border-[#3A2F2F] transition flex items-center justify-center overflow-hidden flex-shrink-0"
+//                 >
+//                     <img
+//                         src={retailerIcons[retailer]}
+//                         alt={retailer}
+//                         style={{ width: '55px', height: '55px', objectFit: 'contain' }}
+//                     />
+//                 </a>
+//             ))}
+//         </div>
+//     );
+// }
+
+// // ── Product recommendations inline ────────────────────────────────────────────
+
+// function StepProducts({ step, products }: { step: string; products: Product[] }) {
+//     const category = stepToCategoryMap[step];
+//     if (!category || !products || products.length === 0) return null;
+
+//     const categoryProducts = products.filter((p) => p.category === category);
+//     if (categoryProducts.length === 0) return null;
+
+//     const topPick = categoryProducts[0];
+//     const alternatives = categoryProducts.slice(1, 3);
+
+//     return (
+//         <div className="mt-5 pt-4 border-t border-[#E6B8C2]/20">
+
+//             {/* Top Pick */}
+//             <div className="bg-[#FBF3F0] rounded-xl p-6 mb-3">
+//                 <div className="flex items-center gap-1.5 mb-2">
+//                     <span className="text-[15px] bg-[#B5838D] text-white px-4 py-2 rounded-full font-medium tracking-wide">
+//                         ⭐ Top Pick
+//                     </span>
+//                 </div>
+//                 <div className="flex items-start justify-between gap-2">
+//                     <div>
+//                         <p className="text-[14px] text-[#3A2F2F]/45 mt-0.5">{topPick.brand}</p>
+//                         <p className="text-md font-medium text-[#3A2F2F]">{topPick.name}</p>
+
+//                     </div>
+//                 </div>
+//                 <p className="text-[15px] text-[#3A2F2F]/55 leading-relaxed mt-4 mb-4 font-light">
+//                     {topPick.description}
+//                 </p>
+//                 <BuyLinks buy_links={topPick.buy_links} />
+//             </div>
+
+//             {/* Alternatives */}
+//             {alternatives.length > 0 && (
+//                 <div>
+//                     <p className="text-[15px] uppercase tracking-[2px] text-[#3A2F2F]/35 mb-2">
+//                         Also great
+//                     </p>
+//                     <div className="space-y-4">
+//                         {alternatives.map((product) => (
+//                             <div
+//                                 key={product.id}
+//                                 className="bg-white border border-[#E6B8C2]/30 rounded-xl p-6 mt-4
+//                                            flex items-start justify-between gap-3 min-h-[80px]"
+//                             >
+//                                 <div className="flex-1 min-w-0">
+//                                     <p className="text-md font-medium text-[#3A2F2F] truncate">
+//                                         {product.name}
+//                                     </p>
+//                                     <p className="text-[14px] text-[#3A2F2F]/40 mt-0.5">
+//                                         {product.brand}
+//                                     </p>
+//                                 </div>
+//                                 <BuyLinks buy_links={product.buy_links} />
+//                             </div>
+//                         ))}
+//                     </div>
+//                 </div>
+//             )}
+//         </div>
+//     );
+// }
+
+// // ── Routine card with inline products ─────────────────────────────────────────
+
+// function RoutineCard({
+//     title,
+//     steps,
+//     accent,
+//     products,
+//     productsLoading,
+// }: {
+//     title: string;
+//     steps: SkinProfile["morning"];
+//     accent: string;
+//     products: Product[];
+//     productsLoading: boolean;
+// }) {
+//     return (
+//         <div className="bg-white border border-[#E6B8C2]/40 rounded-3xl overflow-hidden">
+//             <div className={`px-6 py-4 text-lg ${accent}`}>
+//                 <p className="text-md font-medium text-[#3A2F2F] mt-2">{title}</p>
+//             </div>
+//             <div className="divide-y divide-[#E6B8C2]/20">
+//                 {steps.map((s, i) => (
+//                     <div key={i} className="px-6 py-5">
+//                         <div className="flex gap-4 items-start">
+//                             <span className="text-[11px] font-medium text-[#B5838D] uppercase
+//                                              tracking-widest w-6 text-center mt-0.5 flex-shrink-0">
+//                                 {i + 1}
+//                             </span>
+//                             <div className="flex-1">
+//                                 <p className="text-md uppercase tracking-widest text-[#3A2F2F]/40 mb-0.5">
+//                                     {s.step}
+//                                 </p>
+//                                 <p className="text-md font-medium text-[#3A2F2F] mb-1">
+//                                     {s.product}
+//                                 </p>
+//                                 <p className="text-md text-[#3A2F2F]/50 font-light leading-relaxed">
+//                                     {s.why}
+//                                 </p>
+
+//                                 {/* Inline product recommendations */}
+//                                 {productsLoading ? (
+//                                     <div className="mt-4 pt-4 border-t border-[#E6B8C2]/20 animate-pulse space-y-2">
+//                                         <div className="h-3 w-16 bg-[#E6B8C2]/40 rounded-full" />
+//                                         <div className="h-16 bg-[#E6B8C2]/20 rounded-xl" />
+//                                         <div className="h-10 bg-[#E6B8C2]/10 rounded-xl" />
+//                                     </div>
+//                                 ) : (
+//                                     <StepProducts step={s.step} products={products} />
+//                                 )}
+//                             </div>
+//                         </div>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// }
+
+// // ── Loading intro skeleton ────────────────────────────────────────────────────
+
+// function LoadingIntro() {
+//     return (
+//         <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-6 animate-pulse">
+//             <div className="h-3 w-24 bg-[#E6B8C2]/40 rounded mb-4" />
+//             <div className="space-y-2">
+//                 <div className="h-3 bg-[#E6B8C2]/30 rounded w-full" />
+//                 <div className="h-3 bg-[#E6B8C2]/30 rounded w-5/6" />
+//                 <div className="h-3 bg-[#E6B8C2]/30 rounded w-4/6" />
+//             </div>
+//         </div>
+//     );
+// }
+
+// // ── Name prompt ───────────────────────────────────────────────────────────────
+
+// function NamePrompt({ onSubmit }: { onSubmit: (name: string | null) => void }) {
+//     const [name, setName] = useState("");
+//     return (
+//         <div className="min-h-screen bg-[#FBF3F0] flex items-center justify-center px-6">
+//             <div className="w-full max-w-sm text-center">
+//                 <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-4">
+//                     Almost there
+//                 </p>
+//                 <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-[#3A2F2F] mb-2">
+//                     What should we call you?
+//                 </h2>
+//                 <p className="text-sm text-[#3A2F2F]/50 font-light mb-8">
+//                     So your routine feels a little more personal.
+//                 </p>
+//                 <input
+//                     type="text"
+//                     value={name}
+//                     onChange={(e) => setName(e.target.value)}
+//                     onKeyDown={(e) => e.key === "Enter" && onSubmit(name.trim() || null)}
+//                     placeholder="Your name"
+//                     className="w-full px-5 py-3.5 rounded-full border border-[#E6B8C2]/60
+//                                bg-white text-[#3A2F2F] text-sm placeholder:text-[#3A2F2F]/30
+//                                focus:outline-none focus:border-[#B5838D] transition mb-3"
+//                 />
+//                 <button
+//                     onClick={() => onSubmit(name.trim() || null)}
+//                     className="w-full py-3.5 rounded-full bg-[#3A2F2F] text-[#FBF3F0] text-sm
+//                                font-medium hover:bg-[#B5838D] transition mb-3"
+//                 >
+//                     See my routine →
+//                 </button>
+//                 <button
+//                     onClick={() => onSubmit(null)}
+//                     className="text-xs text-[#3A2F2F]/35 underline underline-offset-2
+//                                hover:text-[#B5838D] transition"
+//                 >
+//                     Skip — show me my results
+//                 </button>
+//             </div>
+//         </div>
+//     );
+// }
+
+// // ── Main results view ─────────────────────────────────────────────────────────
+
+// function ResultsView({ profile, name }: { profile: SkinProfile; name: string | null }) {
+//     const [intro, setIntro] = useState<string | null>(null);
+//     const [loading, setLoading] = useState(true);
+//     const [products, setProducts] = useState<Product[]>([]);
+//     const [productsLoading, setProductsLoading] = useState(true);
+
+//     // Fetch AI intro
+//     useEffect(() => {
+//         async function fetchIntro() {
+//             try {
+//                 const prompt = `You are SkinWise — a warm, knowledgeable skincare assistant created by Shehnaz, a self-care enthusiast who believes skincare is self-care.
+
+// A user just completed a skin quiz. Here are their results:
+// - Skin type: ${profile.skinTypeLabel}
+// - Main concern: ${profile.concernLabel}
+// - Skin sensitivity: ${profile.sensitivity}
+// - Current routine level: ${profile.routineLevel}
+// - Lifestyle: ${profile.lifestyle}
+// - Key ingredients recommended: ${profile.keyIngredients.join(", ")}
+// ${name ? `- Their name: ${name}` : ""}
+
+// Write a short, warm, conversational intro paragraph (3–4 sentences max) that:
+// 1. ${name ? `Addresses them by name (${name})` : "Addresses them warmly without a name"}
+// 2. Summarises their skin profile in plain language
+// 3. Briefly explains WHY this routine was chosen for them
+// 4. Feels encouraging and personal — not clinical
+
+// Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
+
+//                 const res = await fetch("/api/skin-intro", {
+//                     method: "POST",
+//                     headers: { "Content-Type": "application/json" },
+//                     body: JSON.stringify({
+//                         model: "claude-sonnet-4-6",
+//                         max_tokens: 1000,
+//                         messages: [{ role: "user", content: prompt }],
+//                     }),
+//                 });
+
+//                 const data = await res.json();
+//                 const text = data.content?.find((b: { type: string }) => b.type === "text")?.text ?? null;
+//                 setIntro(text);
+//             } catch {
+//                 setIntro(null);
+//             } finally {
+//                 setLoading(false);
+//             }
+//         }
+//         fetchIntro();
+//     }, [profile, name]);
+
+//     // Fetch all products for this skin type in one call
+//     useEffect(() => {
+//         async function fetchProducts() {
+//             try {
+//                 const res = await fetch(`/api/products?skin_type=${profile.skinType}`)
+//                 const data = await res.json()
+//                 setProducts(data.products)
+//             } catch {
+//                 setProducts([])
+//             } finally {
+//                 setProductsLoading(false)
+//             }
+//         }
+//         fetchProducts()
+//     }, [profile.skinType])
+
+//     return (
+//         <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6">
+//             <div className="max-w-3xl mx-auto">
+
+//                 {/* Header */}
+//                 <div className="mb-8">
+//                     <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-2">
+//                         Your skin profile
+//                     </p>
+//                     <h1 className="font-[family-name:var(--font-playfair)] text-4xl text-[#3A2F2F] mb-1">
+//                         {profile.skinTypeLabel} skin
+//                     </h1>
+//                     <p className="text-sm text-[#3A2F2F]/50 font-light">
+//                         Main concern: {profile.concernLabel}
+//                     </p>
+//                 </div>
+
+//                 {/* Key ingredients */}
+//                 <div className="flex flex-wrap gap-2 mb-8">
+//                     {profile.keyIngredients.map((ing) => (
+//                         <span
+//                             key={ing}
+//                             className="bg-white border border-[#E6B8C2] rounded-full px-4 py-1.5
+//                                        text-xs text-[#B5838D]"
+//                         >
+//                             {ing}
+//                         </span>
+//                     ))}
+//                 </div>
+
+//                 {/* AI intro */}
+//                 {loading ? (
+//                     <LoadingIntro />
+//                 ) : intro ? (
+//                     <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-8">
+//                         <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-3">
+//                             Your personal note
+//                         </p>
+//                         <p className="text-sm text-[#3A2F2F]/75 leading-relaxed font-light">
+//                             {intro}
+//                         </p>
+//                     </div>
+//                 ) : null}
+
+//                 {/* Routine cards with inline product recommendations */}
+//                 <div className="space-y-5 mb-10">
+//                     <RoutineCard
+//                         title="☀️  Morning routine"
+//                         steps={profile.morning}
+//                         accent="bg-[#FBF3F0]"
+//                         products={products}
+//                         productsLoading={productsLoading}
+//                     />
+//                     <RoutineCard
+//                         title="🌙  Evening routine"
+//                         steps={profile.evening}
+//                         accent="bg-[#F0E4DF]"
+//                         products={products}
+//                         productsLoading={productsLoading}
+//                     />
+//                 </div>
+
+//                 {/* Retake */}
+//                 <div className="text-center">
+//                     <Link
+//                         href="/quiz"
+//                         className="text-s text-[#3A2F2F]/40 underline underline-offset-2
+//                                    hover:text-[#B5838D] transition"
+//                     >
+//                         Retake the quiz
+//                     </Link>
+//                 </div>
+
+//             </div>
+//         </main>
+//     );
+// }
+
+// // ── Root export ───────────────────────────────────────────────────────────────
+
+// export default function ResultsClient({ answers }: { answers: SkinAnswers }) {
+//     const [name, setName] = useState<string | null | undefined>(undefined);
+//     const profile = buildSkinProfile(answers);
+
+//     if (name === undefined) {
+//         return <NamePrompt onSubmit={setName} />;
+//     }
+
+//     return <ResultsView profile={profile} name={name} />;
+// }
+
+
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,17 +438,11 @@ type Product = {
     };
 };
 
-type ProductsByCategory = Record<string, Product[]>;
-
-// ── Retailer icons ─────────────────────────────────────────────────────────────
-
 const retailerIcons: Record<string, string> = {
     amazon: "/logos/Amazon_icon.png",
     ulta: "/logos/ulta.png",
     sephora: "/logos/sephora.png",
 };
-
-// ── Step → category mapping ───────────────────────────────────────────────────
 
 const stepToCategoryMap: Record<string, string> = {
     "Cleanser": "cleanser",
@@ -44,24 +455,25 @@ const stepToCategoryMap: Record<string, string> = {
     "Treatment": "serum",
 };
 
-// ── Buy links ─────────────────────────────────────────────────────────────────
+// ── Buy Links ─────────────────────────────────────────────────────────────────
 
 function BuyLinks({ buy_links }: { buy_links: Product["buy_links"] }) {
     return (
-        <div className="flex gap-4 flex-wrap mt-4">
+        <div className="flex gap-3 flex-wrap mt-4">
             {Object.entries(buy_links).map(([retailer, url]) => (
                 <a
                     key={retailer}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full border border-[#E6B8C2] hover:bg-[#3A2F2F]
-                       hover:border-[#3A2F2F] transition flex items-center justify-center overflow-hidden flex-shrink-0"
+                    className="w-10 h-10 rounded-full border border-[#E6B8C2]
+                    hover:bg-[#3A2F2F] hover:border-[#3A2F2F]
+                    transition flex items-center justify-center overflow-hidden"
                 >
                     <img
                         src={retailerIcons[retailer]}
                         alt={retailer}
-                        style={{ width: '55px', height: '55px', objectFit: 'contain' }}
+                        className="w-6 h-6 object-contain"
                     />
                 </a>
             ))}
@@ -69,63 +481,72 @@ function BuyLinks({ buy_links }: { buy_links: Product["buy_links"] }) {
     );
 }
 
-// ── Product recommendations inline ────────────────────────────────────────────
+// ── Step Products ─────────────────────────────────────────────────────────────
 
 function StepProducts({ step, products }: { step: string; products: Product[] }) {
     const category = stepToCategoryMap[step];
-    if (!category || !products || products.length === 0) return null;
+    if (!category) return null;
 
-    const categoryProducts = products.filter((p) => p.category === category);
-    if (categoryProducts.length === 0) return null;
+    const filtered = products.filter((p) => p.category === category);
+    if (!filtered.length) return null;
 
-    const topPick = categoryProducts[0];
-    const alternatives = categoryProducts.slice(1, 3);
+    const topPick = filtered[0];
+    const alternatives = filtered.slice(1, 3);
 
     return (
-        <div className="mt-5 pt-4 border-t border-[#E6B8C2]/20">
+        <div className="mt-6 space-y-4">
 
             {/* Top Pick */}
-            <div className="bg-[#FBF3F0] rounded-xl p-6 mb-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-[15px] bg-[#B5838D] text-white px-4 py-2 rounded-full font-medium tracking-wide">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E6B8C2]/30 flex gap-6 hover:-translate-y-1 transition">
+
+                <div className="w-24 h-32 bg-[#F5E6E2] rounded-xl" />
+
+                <div className="flex-1">
+                    <span className="text-xs bg-[#B5838D] text-white px-3 py-1 rounded-full">
                         ⭐ Top Pick
                     </span>
-                </div>
-                <div className="flex items-start justify-between gap-2">
-                    <div>
-                        <p className="text-[14px] text-[#3A2F2F]/45 mt-0.5">{topPick.brand}</p>
-                        <p className="text-md font-medium text-[#3A2F2F]">{topPick.name}</p>
 
+                    <p className="text-sm text-[#3A2F2F]/50 mt-3">
+                        {topPick.brand}
+                    </p>
+
+                    <p className="text-lg font-medium text-[#3A2F2F]">
+                        {topPick.name}
+                    </p>
+
+                    <p className="text-sm text-[#3A2F2F]/75 mt-2">
+                        {topPick.description}
+                    </p>
+
+                    <div className="flex items-center justify-between mt-4">
+                        <BuyLinks buy_links={topPick.buy_links} />
+
+                        <button className="px-5 py-2 rounded-full bg-[#B5838D] text-white text-sm hover:opacity-90 transition">
+                            View Product →
+                        </button>
                     </div>
                 </div>
-                <p className="text-[15px] text-[#3A2F2F]/55 leading-relaxed mt-4 mb-4 font-light">
-                    {topPick.description}
-                </p>
-                <BuyLinks buy_links={topPick.buy_links} />
             </div>
 
             {/* Alternatives */}
             {alternatives.length > 0 && (
                 <div>
-                    <p className="text-[15px] uppercase tracking-[2px] text-[#3A2F2F]/35 mb-2">
+                    <p className="text-xs uppercase tracking-widest text-[#3A2F2F]/40 mb-2">
                         Also great
                     </p>
-                    <div className="space-y-4">
-                        {alternatives.map((product) => (
+
+                    <div className="space-y-3">
+                        {alternatives.map((p) => (
                             <div
-                                key={product.id}
-                                className="bg-white border border-[#E6B8C2]/30 rounded-xl p-6 mt-4
-                                           flex items-start justify-between gap-3 min-h-[80px]"
+                                key={p.id}
+                                className="bg-white border border-[#E6B8C2]/70 rounded-xl px-6 py-4 flex justify-between items-center hover:shadow-md transition"
                             >
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-md font-medium text-[#3A2F2F] truncate">
-                                        {product.name}
-                                    </p>
-                                    <p className="text-[14px] text-[#3A2F2F]/40 mt-0.5">
-                                        {product.brand}
-                                    </p>
+                                <div>
+                                    <p className="text-sm text-[#3A2F2F]/50 font-medium">{p.name}</p>
+
+                                    <p className="text-md text-[#3A2F2F]/75 mt-2">{p.brand}</p>
                                 </div>
-                                <BuyLinks buy_links={product.buy_links} />
+                                <BuyLinks buy_links={p.buy_links} />
                             </div>
                         ))}
                     </div>
@@ -135,56 +556,59 @@ function StepProducts({ step, products }: { step: string; products: Product[] })
     );
 }
 
-// ── Routine card with inline products ─────────────────────────────────────────
+// ── Routine Card ──────────────────────────────────────────────────────────────
 
 function RoutineCard({
     title,
     steps,
-    accent,
     products,
     productsLoading,
 }: {
     title: string;
     steps: SkinProfile["morning"];
-    accent: string;
     products: Product[];
     productsLoading: boolean;
 }) {
     return (
-        <div className="bg-white border border-[#E6B8C2]/40 rounded-3xl overflow-hidden">
-            <div className={`px-6 py-4 text-lg ${accent}`}>
-                <p className="text-md font-medium text-[#3A2F2F] mt-2">{title}</p>
-            </div>
-            <div className="divide-y divide-[#E6B8C2]/20">
-                {steps.map((s, i) => (
-                    <div key={i} className="px-6 py-5">
-                        <div className="flex gap-4 items-start">
-                            <span className="text-[11px] font-medium text-[#B5838D] uppercase
-                                             tracking-widest w-6 text-center mt-0.5 flex-shrink-0">
-                                {i + 1}
-                            </span>
-                            <div className="flex-1">
-                                <p className="text-md uppercase tracking-widest text-[#3A2F2F]/40 mb-0.5">
-                                    {s.step}
-                                </p>
-                                <p className="text-md font-medium text-[#3A2F2F] mb-1">
-                                    {s.product}
-                                </p>
-                                <p className="text-md text-[#3A2F2F]/50 font-light leading-relaxed">
-                                    {s.why}
-                                </p>
+        <div className="bg-white border border-[#E6B8C2]/60 rounded-3xl p-8 shadow-sm">
 
-                                {/* Inline product recommendations */}
-                                {productsLoading ? (
-                                    <div className="mt-4 pt-4 border-t border-[#E6B8C2]/20 animate-pulse space-y-2">
-                                        <div className="h-3 w-16 bg-[#E6B8C2]/40 rounded-full" />
-                                        <div className="h-16 bg-[#E6B8C2]/20 rounded-xl" />
-                                        <div className="h-10 bg-[#E6B8C2]/10 rounded-xl" />
-                                    </div>
-                                ) : (
-                                    <StepProducts step={s.step} products={products} />
-                                )}
+            <h2 className="text-lg font-medium text-[#3A2F2F] mb-6">
+                {title}
+            </h2>
+
+            <div className="space-y-8">
+                {steps.map((s, i) => (
+                    <div key={i} className="flex gap-6">
+
+                        {/* Timeline */}
+                        <div className="flex flex-col items-center">
+                            <div className="w-8 h-8 rounded-full bg-[#B5838D] text-white flex items-center justify-center text-sm">
+                                {i + 1}
                             </div>
+                            {i !== steps.length - 1 && (
+                                <div className="w-[2px] flex-1 bg-[#E6B8C2]/50 mt-2" />
+                            )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                            <p className="text-xs uppercase tracking-widest text-[#3A2F2F]/50 mb-1">
+                                {s.step}
+                            </p>
+
+                            <p className="text-lg font-medium text-[#3A2F2F] mb-1">
+                                {s.product}
+                            </p>
+
+                            <p className="text-sm text-[#3A2F2F]/55">
+                                {s.why}
+                            </p>
+
+                            {productsLoading ? (
+                                <div className="mt-4 h-24 bg-[#E6B8C2]/50 rounded-xl animate-pulse" />
+                            ) : (
+                                <StepProducts step={s.step} products={products} />
+                            )}
                         </div>
                     </div>
                 ))}
@@ -193,22 +617,8 @@ function RoutineCard({
     );
 }
 
-// ── Loading intro skeleton ────────────────────────────────────────────────────
+// ── Name Prompt ───────────────────────────────────────────────────────────────
 
-function LoadingIntro() {
-    return (
-        <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-6 animate-pulse">
-            <div className="h-3 w-24 bg-[#E6B8C2]/40 rounded mb-4" />
-            <div className="space-y-2">
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-full" />
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-5/6" />
-                <div className="h-3 bg-[#E6B8C2]/30 rounded w-4/6" />
-            </div>
-        </div>
-    );
-}
-
-// ── Name prompt ───────────────────────────────────────────────────────────────
 
 function NamePrompt({ onSubmit }: { onSubmit: (name: string | null) => void }) {
     const [name, setName] = useState("");
@@ -253,154 +663,143 @@ function NamePrompt({ onSubmit }: { onSubmit: (name: string | null) => void }) {
     );
 }
 
-// ── Main results view ─────────────────────────────────────────────────────────
+// ── Results View ──────────────────────────────────────────────────────────────
 
 function ResultsView({ profile, name }: { profile: SkinProfile; name: string | null }) {
-    const [intro, setIntro] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
     const [products, setProducts] = useState<Product[]>([]);
     const [productsLoading, setProductsLoading] = useState(true);
 
-    // Fetch AI intro
-    useEffect(() => {
-        async function fetchIntro() {
-            try {
-                const prompt = `You are SkinWise — a warm, knowledgeable skincare assistant created by Shehnaz, a self-care enthusiast who believes skincare is self-care.
-
-A user just completed a skin quiz. Here are their results:
-- Skin type: ${profile.skinTypeLabel}
-- Main concern: ${profile.concernLabel}
-- Skin sensitivity: ${profile.sensitivity}
-- Current routine level: ${profile.routineLevel}
-- Lifestyle: ${profile.lifestyle}
-- Key ingredients recommended: ${profile.keyIngredients.join(", ")}
-${name ? `- Their name: ${name}` : ""}
-
-Write a short, warm, conversational intro paragraph (3–4 sentences max) that:
-1. ${name ? `Addresses them by name (${name})` : "Addresses them warmly without a name"}
-2. Summarises their skin profile in plain language
-3. Briefly explains WHY this routine was chosen for them
-4. Feels encouraging and personal — not clinical
-
-Do not use bullet points. Do not use markdown. Just plain, warm prose.`;
-
-                const res = await fetch("/api/skin-intro", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-6",
-                        max_tokens: 1000,
-                        messages: [{ role: "user", content: prompt }],
-                    }),
-                });
-
-                const data = await res.json();
-                const text = data.content?.find((b: { type: string }) => b.type === "text")?.text ?? null;
-                setIntro(text);
-            } catch {
-                setIntro(null);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchIntro();
-    }, [profile, name]);
-
-    // Fetch all products for this skin type in one call
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const res = await fetch(`/api/products?skin_type=${profile.skinType}`)
-                const data = await res.json()
-                setProducts(data.products)
+                const res = await fetch(`/api/products?skin_type=${profile.skinType}`);
+                const data = await res.json();
+                setProducts(data.products);
             } catch {
-                setProducts([])
+                setProducts([]);
             } finally {
-                setProductsLoading(false)
+                setProductsLoading(false);
             }
         }
-        fetchProducts()
-    }, [profile.skinType])
+        fetchProducts();
+    }, [profile.skinType]);
 
     return (
         <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-6xl mx-auto">
 
-                {/* Header */}
-                <div className="mb-8">
-                    <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-2">
-                        Your skin profile
-                    </p>
-                    <h1 className="font-[family-name:var(--font-playfair)] text-4xl text-[#3A2F2F] mb-1">
-                        {profile.skinTypeLabel} skin
-                    </h1>
-                    <p className="text-sm text-[#3A2F2F]/50 font-light">
-                        Main concern: {profile.concernLabel}
-                    </p>
-                </div>
+                {/* HERO */}
+                {/* <div className="grid md:grid-cols-2 gap-30 mb-14">
 
-                {/* Key ingredients */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                    {profile.keyIngredients.map((ing) => (
-                        <span
-                            key={ing}
-                            className="bg-white border border-[#E6B8C2] rounded-full px-4 py-1.5
-                                       text-xs text-[#B5838D]"
-                        >
-                            {ing}
-                        </span>
-                    ))}
-                </div>
+                    <div>
+                        <p className="text-[#B5838D]">Your skin profile</p>
+                      
+                        <h1 className="font-[family-name:var(--font-playfair)] text-4xl text-[#3A2F2F] mb-1">
+                            {profile.skinTypeLabel} skin
+                        </h1>
 
-                {/* AI intro */}
-                {loading ? (
-                    <LoadingIntro />
-                ) : intro ? (
-                    <div className="bg-white/70 border border-[#E6B8C2]/40 rounded-2xl p-6 mb-8">
-                        <p className="text-[11px] uppercase tracking-[3px] text-[#B5838D] mb-3">
-                            Your personal note
+                        <p className="text-sm mb-6 text-[#B5838D]">
+                            Main concern: {profile.concernLabel}
                         </p>
-                        <p className="text-sm text-[#3A2F2F]/75 leading-relaxed font-light">
-                            {intro}
-                        </p>
+
+                        <div className="flex flex-wrap gap-2 text-[#B5838D]">
+                            {profile.keyIngredients.map((i) => (
+                                <span key={i} className="border px-3 py-1 rounded-full text-xs">
+                                    {i}
+                                </span>
+                            ))}
+                        </div>
                     </div>
-                ) : null}
+                   
 
-                {/* Routine cards with inline product recommendations */}
-                <div className="space-y-5 mb-10">
+                    <div className="bg-[#FBF7F8] p-6 rounded-6xl shadow-sm text-[#3A2F2F] mb-6 pr-0">
+                        <p className="text-lg font-semibold mb-6">✨ Quick tips for your skin</p>
+                        <ul className="space-y-5">
+                            {[
+                                { icon: "🧴", text: "Use a gentle, hydrating cleanser" },
+                                { icon: "🚿", text: "Avoid hot water – it can dry you out" },
+                                { icon: "🔒", text: "Moisturize while skin is still damp" },
+                                { icon: "☀️", text: "Don't skip sunscreen (even indoors)" },
+                            ].map(({ icon, text }) => (
+                                <li key={text} className="flex items-center gap-2 text-sm">
+                                    <span className="w-8 h-8 rounded-xl border border-[#E6B8C2] flex items-center
+                                 justify-center text-[#B5838D] flex-shrink-0 text-base">
+                                        {icon}
+                                    </span>
+                                    {text}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div> */}
+                <div className="grid md:grid-cols-2 gap-8 items-stretch">
+
+                    <div className="bg-[#FBF7F8] rounded-3xl p-8 flex flex-col justify-center">
+                        <p className="text-[#B5838D] text-[11px] uppercase tracking-[3px] mb-3">Your skin profile</p>
+                        <h1 className="font-[family-name:var(--font-playfair)] text-4xl text-[#3A2F2F] mb-2">
+                            {profile.skinTypeLabel} skin
+                        </h1>
+                        <p className="text-sm mb-6 text-[#B5838D]">
+                            Main concern: {profile.concernLabel}
+                        </p>
+                        <div className="flex flex-wrap gap-2 text-[#B5838D]">
+                            {profile.keyIngredients.map((i) => (
+                                <span key={i} className="border border-[#E6B8C2] px-3 py-1 rounded-full text-xs">
+                                    {i}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-[#FBF7F8] flex flex-col justify-center">
+                        <div className="px-4 rounded-3xl shadow-sm text-[#3A2F2F]">
+                            <p className="text-lg font-semibold mb-6">✨ Quick tips for your skin</p>
+                            <ul className="space-y-5 list-none pl-0 ml-0">
+                                {[
+                                    { icon: "🧴", text: "Use a gentle, hydrating cleanser" },
+                                    { icon: "🚿", text: "Avoid hot water – it can dry you out" },
+                                    { icon: "🔒", text: "Moisturize while skin is still damp" },
+                                    { icon: "☀️", text: "Don't skip sunscreen (even indoors)" },
+                                ].map(({ icon, text }) => (
+                                    <li key={text} className="flex items-center gap-4 text-sm">
+                                        <span className="w-10 h-10 rounded-full border border-[#E6B8C2] flex items-center
+                                     justify-center text-[#B5838D] flex-shrink-0">
+                                            {icon}
+                                        </span>
+                                        {text}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ROUTINES */}
+                <div className="space-y-8">
                     <RoutineCard
-                        title="☀️  Morning routine"
+                        title="☀️ Morning Routine"
                         steps={profile.morning}
-                        accent="bg-[#FBF3F0]"
                         products={products}
                         productsLoading={productsLoading}
                     />
+
                     <RoutineCard
-                        title="🌙  Evening routine"
+                        title="🌙 Evening Routine"
                         steps={profile.evening}
-                        accent="bg-[#F0E4DF]"
                         products={products}
                         productsLoading={productsLoading}
                     />
                 </div>
 
-                {/* Retake */}
-                <div className="text-center">
-                    <Link
-                        href="/quiz"
-                        className="text-s text-[#3A2F2F]/40 underline underline-offset-2
-                                   hover:text-[#B5838D] transition"
-                    >
-                        Retake the quiz
-                    </Link>
+                <div className="text-center mt-10">
+                    <Link href="/quiz">Retake Quiz</Link>
                 </div>
-
             </div>
         </main>
     );
 }
 
-// ── Root export ───────────────────────────────────────────────────────────────
+// ── Root ──────────────────────────────────────────────────────────────────────
 
 export default function ResultsClient({ answers }: { answers: SkinAnswers }) {
     const [name, setName] = useState<string | null | undefined>(undefined);
