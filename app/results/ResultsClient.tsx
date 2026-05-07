@@ -271,8 +271,9 @@ function ResultsView({ profile, name }: { profile: SkinProfile; name: string | n
     }, [profile.skinType]);
 
     return (
-        <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6">
-            <div className="max-w-6xl mx-auto">
+        // <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6">
+        <main className="min-h-screen bg-[#FBF3F0] pt-24 pb-16 px-6 overflow-x-hidden">
+            <div className="max-w-6xl mx-auto overflow-hidden">
 
                 {/* HERO */}
                 {/* <div className="grid md:grid-cols-2 gap-30 mb-14">
@@ -318,7 +319,9 @@ function ResultsView({ profile, name }: { profile: SkinProfile; name: string | n
                         </ul>
                     </div>
                 </div> */}
-                <div className="grid md:grid-cols-2 gap-8 items-start">
+
+
+                <div className="grid md:grid-cols-2 gap-8 items-start w-full mb-8">
 
                     <div className="bg-[#FBF7F8] rounded-3xl p-8 flex flex-col justify-center">
                         <p className="text-[#B5838D] text-[11px] uppercase tracking-[3px] mb-3">Your skin profile</p>
@@ -337,8 +340,11 @@ function ResultsView({ profile, name }: { profile: SkinProfile; name: string | n
                         </div>
                     </div>
 
-                    <div className="rounded-3xl text-[#3A2F2F]">
-                        <div className="border border-[#E6B8C2] p-4">
+
+                    <div className="border border-[#E6B8C2] rounded-3xl p-8 text-[#3A2F2F] w-full flex gap-8">
+
+
+                        <div className="flex-1">
                             <p className="text-lg font-semibold mb-6">✨ Quick tips for your skin</p>
                             <ul className="space-y-5 list-none pl-0 ml-0">
                                 {[
@@ -356,6 +362,12 @@ function ResultsView({ profile, name }: { profile: SkinProfile; name: string | n
                                 ))}
                             </ul>
                         </div>
+
+                        <img
+                            src="/logos/skin.jpg"
+                            style={{ width: '240px', height: '200px', objectFit: 'cover', borderRadius: '1rem', flexShrink: 0 }}
+                        />
+
                     </div>
 
                 </div>
